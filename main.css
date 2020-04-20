@@ -1,13 +1,13 @@
 html,
 body {
     margin: 0;
-    overflow: hidden;
+    overflow: scroll;
     height: 100%;
     font-family: Verdana, Arial, Sans-serif;
 }
 svg {
-    width: 100%;
-    height: 100%;
+    width: 2480px;
+    height: 1748px;
 }
 line {
     stroke-width: 3px;
