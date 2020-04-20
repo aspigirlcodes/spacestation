@@ -13,3 +13,37 @@ line {
     stroke-width: 3px;
     stroke: red;
 }
+.explainer {
+    padding: 1rem;
+    background-color: #0E131F;
+    color: #F7EBEC;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+}
+.explainer span{
+    padding: 0.5rem;
+}
+
+button{
+    padding: 1rem;
+    background-color:#C5D86D;
+    border: none;
+}
+
+button.reset{
+    background-color: #9D3F42;
+    color: #F7EBEC;
+}
+
+button.hidden{
+    display: none;
+}
+
+@media print {
+    .dont_print{
+        display: none !important;
+    }
+}
+   

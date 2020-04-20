@@ -2,11 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=.5, maximum-scale=12.0, minimum-scale=.25,">
+    <meta name="viewport" content="width=device-width, initial-scale=.5, maximum-scale=12.0, minimum-scale=.25">
     <title>Space station</title>
     <link rel="stylesheet" href="main.css" type="text/css">
   </head>
   <body>
+    <div class="explainer dont_print">
+        <span> 
+            <b>Step 1:</b> <button onclick="draw_station()">Generate New Spacestation</button>
+        </span>
+        <span>
+            <b>Step 2:</b> The generator tends to overcrowd the image. You can click elements to remove them. <button class="reset hidden" onclick="reset_hidden()">Reset</button>
+        </span>
+        <span>
+            <b>Step 3:</b> <button onclick="window.print()">Print Your Station</button>
+        </span>
+        
+    </div>
     <svg id="svg">
         <g id="drawing" transform="scale(0.5)">
 
@@ -1295,71 +1307,96 @@
             circle.setAttribute('r', 10)
             drawing.append(circle)
         }
-
-        
-
-        var remaining_objects = Object.keys(data).filter(key => !data[key].endpoint)
-        var remaining_endpoints = {
-            "0": Object.keys(data).filter(key => data[key].endpoint && data[key].interfaces["0"]),
-            "1": Object.keys(data).filter(key => data[key].endpoint && data[key].interfaces["1"]),
-            "2": Object.keys(data).filter(key => data[key].endpoint && data[key].interfaces["2"]),
-            "3": Object.keys(data).filter(key => data[key].endpoint && data[key].interfaces["3"])
-        } 
-
-        var position = {x: 600, y: 900}
-        var first = true
-        
-        function add_endpoint(interface, body_data, position){
-            var opposite_interface = ((parseInt(interface) + 2 ) % 4).toString()
-            if(body_data.interfaces[interface] && remaining_endpoints[opposite_interface].length>0){
-                var if0_key = remaining_endpoints[opposite_interface][remaining_endpoints[opposite_interface].length * Math.random() << 0]
-                var x_index = (parseInt(interface) + 1) %2
-                var y_index = parseInt(interface) % 2
-                var if0_pos = {x: position.x + body_data.interfaces[interface][x_index] * body_data.scale, y: position.y + body_data.interfaces[interface][y_index] * body_data.scale }
-                
-                var if0_path = document.getElementById(if0_key)
-                svg.removeChild(if0_path)
-                var if0_data = data[if0_key]
-                if0_pos.x = if0_pos.x - if0_data.interfaces[opposite_interface][x_index] * if0_data.scale
-                if0_pos.y = if0_pos.y - if0_data.interfaces[opposite_interface][y_index] * if0_data.scale
-                if0_path.setAttribute('transform', `translate(${if0_pos.x} ${if0_pos.y}) scale(${if0_data.scale}) rotate(${if0_data.rotation} ${if0_data.width/2} ${if0_data.height/2})`)
-                if0_path.setAttribute('visibility', "visible")
-                if(interface === "0" || interface === "3"){
-                    drawing.append(if0_path)
-                } else {
-                    drawing.prepend(if0_path)
-                }
-                remaining_endpoints[opposite_interface] = remaining_endpoints[opposite_interface].filter(element => element != if0_key)
-            }
-        }
-
-        //while(false){
-        while(remaining_objects.length > 0){
-            let random_key = remaining_objects[ remaining_objects.length * Math.random() << 0]
-            let path = document.getElementById(random_key)
-            svg.removeChild(path)
-            let random_data = data[random_key]
-            position.x = position.x - random_data.interfaces["3"][0] * random_data.scale
-            position.y = position.y - random_data.interfaces["3"][1] * random_data.scale
-            path.setAttribute('transform', `translate(${position.x} ${position.y}) scale(${random_data.scale}) rotate(${random_data.rotation} ${random_data.width/2} ${random_data.height/2})`)
-            path.setAttribute('visibility', "visible")
-            remaining_objects = remaining_objects.filter(element =>  element != random_key)
-            drawing.prepend(path)
-            // append endpoint to interface 0
-            add_endpoint("0", random_data, position)
-            add_endpoint("2", random_data, position)
-            if (first){
-                add_endpoint("3", random_data, position)
-                first = false
-            }
-            if (remaining_objects.length === 0){
-                add_endpoint("1", random_data, position)
-            }
-           
-            position.x = position.x + random_data.interfaces["1"][0] * random_data.scale
-            position.y = position.y + random_data.interfaces["1"][1] * random_data.scale
+        function toggle_visibility(){
+            this.setAttribute("visibility", "hidden")
+            this.classList.add("hidden")
+            document.getElementsByClassName("reset")[0].classList.remove("hidden")
             
         }
+        function reset_hidden(){
+            console.log(drawing.getElementsByClassName("hidden"))
+            while( drawing.getElementsByClassName("hidden")[0]){
+                elem = drawing.getElementsByClassName("hidden")[0]
+                console.log(elem)
+                elem.setAttribute("visibility", "visible")
+                elem.classList.remove("hidden")
+            }
+            document.getElementsByClassName("reset")[0].classList.add('hidden')
+        }
+
+        function draw_station(){
+            drawing.innerHTML = ""
+            var remaining_objects = Object.keys(data).filter(key => !data[key].endpoint)
+            var remaining_endpoints = {
+                "0": Object.keys(data).filter(key => data[key].endpoint && data[key].interfaces["0"]),
+                "1": Object.keys(data).filter(key => data[key].endpoint && data[key].interfaces["1"]),
+                "2": Object.keys(data).filter(key => data[key].endpoint && data[key].interfaces["2"]),
+                "3": Object.keys(data).filter(key => data[key].endpoint && data[key].interfaces["3"])
+            } 
+
+            var position = {x: 600, y: 900}
+            var first = true
+            
+            function add_endpoint(interface, body_data, position){
+                var opposite_interface = ((parseInt(interface) + 2 ) % 4).toString()
+                if(body_data.interfaces[interface] && remaining_endpoints[opposite_interface].length>0){
+                    var if0_key = remaining_endpoints[opposite_interface][remaining_endpoints[opposite_interface].length * Math.random() << 0]
+                    var x_index = (parseInt(interface) + 1) %2
+                    var y_index = parseInt(interface) % 2
+                    var if0_pos = {x: position.x + body_data.interfaces[interface][x_index] * body_data.scale, y: position.y + body_data.interfaces[interface][y_index] * body_data.scale }
+                    
+                    var if0_path = document.getElementById(if0_key).cloneNode(true)
+                    //svg.removeChild(if0_path)
+                    var if0_data = data[if0_key]
+                    if0_pos.x = if0_pos.x - if0_data.interfaces[opposite_interface][x_index] * if0_data.scale
+                    if0_pos.y = if0_pos.y - if0_data.interfaces[opposite_interface][y_index] * if0_data.scale
+                    if0_path.setAttribute('transform', `translate(${if0_pos.x} ${if0_pos.y}) scale(${if0_data.scale}) rotate(${if0_data.rotation} ${if0_data.width/2} ${if0_data.height/2})`)
+                    if0_path.setAttribute('visibility', "visible")
+                    if0_path.setAttribute('id', if0_path.getAttribute("id") + "_drawing")
+                    if0_path.addEventListener("click", toggle_visibility)
+                    if(interface === "0" || interface === "3"){
+                        drawing.append(if0_path)
+                    } else {
+                        drawing.prepend(if0_path)
+                    }
+                    remaining_endpoints[opposite_interface] = remaining_endpoints[opposite_interface].filter(element => element != if0_key)
+                }
+            }
+
+            //while(false){
+            while(remaining_objects.length > 0){
+                let random_key = remaining_objects[ remaining_objects.length * Math.random() << 0]
+                let path = document.getElementById(random_key).cloneNode(true)
+                //svg.removeChild(path)
+                let random_data = data[random_key]
+                position.x = position.x - random_data.interfaces["3"][0] * random_data.scale
+                position.y = position.y - random_data.interfaces["3"][1] * random_data.scale
+                path.setAttribute('transform', `translate(${position.x} ${position.y}) scale(${random_data.scale}) rotate(${random_data.rotation} ${random_data.width/2} ${random_data.height/2})`)
+                path.setAttribute('visibility', "visible")
+                path.setAttribute('id', path.getAttribute("id") + "_drawing")
+                path.addEventListener("click", toggle_visibility)
+                remaining_objects = remaining_objects.filter(element =>  element != random_key)
+                drawing.prepend(path)
+                // append endpoint to interface 0
+                add_endpoint("0", random_data, position)
+                add_endpoint("2", random_data, position)
+                if (first){
+                    add_endpoint("3", random_data, position)
+                    first = false
+                }
+                if (remaining_objects.length === 0){
+                    add_endpoint("1", random_data, position)
+                }
+            
+                position.x = position.x + random_data.interfaces["1"][0] * random_data.scale
+                position.y = position.y + random_data.interfaces["1"][1] * random_data.scale
+                
+            }
+        }
+
+
+        
+        draw_station()
 
 
         
